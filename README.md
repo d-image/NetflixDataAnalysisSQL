@@ -358,141 +358,93 @@ Where type = 'Movie' AND Year(date_added) = 2021
 SELECT Trim(value) AS Directors, Type, Count(*) MovieANDTVShow 
 FROM Netflix_Titles_Filter
 CROSS APPLY string_split(director, ',')
-```
 WHERE type IN('Movie', 'TV Show') AND Director <> 'NA' 
-
 GROUP BY Trim(value), Type
  
+### 19.	Which country has highest number of comedy movies?
  
- 
- 
---19.	Which country has highest number of comedy movies?
- 
+```sql
 SELECT TOP 1 Trim(value) All_Country, Count(*) COMEDIES
-
 FROM Netflix_Titles_Filter
-
 CROSS APPLY string_split(country, ',')
-
 WHERE Type = 'Movie' AND listed_in LIKE '%comedies%' AND Trim(value) <> 'NA'
-
 GROUP BY Trim(value)
-
 ORDER BY Count(*) DESC
+``` 
  
  
+### 20.	For each year, which director has maximum number of movies released
  
---20.	For each year, which director has maximum number of movies released
- 
+```sql
 SELECT release_year, Trim(value) DIRECTOR, Count(*) MOVIES
-
 FROM Netflix_Titles_Filter
-
 CROSS APPLY string_split(director, ',')
-
 WHERE Type = 'Movie' AND director <> 'NA'
-
 GROUP BY release_year, Trim(value)
-
 ORDER BY Count(*) DESC
+``` 
  
+### 21.	What is the average running length of movies in each genre?
  
- 
- 
---21.	What is the average running length of movies in each genre?
- 
+```sql
 SELECT Type, Title, Trim(value) as AVGERAGELEN
-
 FROM netflix_titles_filter
-
 CROSS APPLY string_split(Duration, ' ', 1)
-
 WHERE type = 'Movie' and Ordinal = 1
-
+```
  
+### 22.	List directors who have directed both comedies and horror films.
  
- 
---22.	List directors who have directed both comedies and horror films.
- 
+```sql
 SELECT DISTINCT Director, Trim(value) as ComedyAndHorror
-
 FROM Netflix_Titles_Filter
-
 CROSS APPLY string_split(Listed_in, ',')
-
 WHERE Listed_in LIKE '%Comedies%' AND Listed_in LIKE '%Horror%' AND Director <> 'NA'
-
 GROUP BY Trim(value), Director
-
 HAVING Trim(value) <> 'Independent Movies' AND Trim(value) <> 'Sci-Fi & Fantasy' AND Trim(value) <> 'International Movies' AND Trim(value) <> 'Action & Adventure' AND Trim(value) <> 'Cult Movies'
+```
  
- 
- 
---23.	List the director's name and the number of horror and comedy films that he or she has directed.
+### 23.	List the director's name and the number of horror and comedy films that he or she has directed.
 
+```sql
 SELECT Director, Count(*) MovieNumbers, Trim(value) as ComedyAndHorror
-
 FROM Netflix_Titles_Filter
-
 CROSS APPLY string_split(Listed_in, ',')
-
 WHERE Listed_in LIKE '%Comedies%' AND Listed_in LIKE '%Horror%' AND Director <> 'NA'
-
 GROUP BY Trim(value), Director
-
 HAVING Trim(value) <> 'Independent Movies' AND Trim(value) <> 'Sci-Fi & Fantasy' AND Trim(value) <> 'International Movies' AND Trim(value) <> 'Action & Adventure' AND Trim(value) <> 'Cult Movies'
-
 ORDER BY Count(*) DESC
+``` 
  
  
+### 24.	Find the Most Common Rating for Movies and TV Shows
  
---24.	Find the Most Common Rating for Movies and TV Shows
- 
+```sql
 SELECT Rating, COUNT(*) AS CountRating
-
 FROM (
-
     SELECT Rating
-
     FROM Netflix_Titles_filter
-
     UNION ALL 
-
     SELECT Rating
-
     FROM Netflix_Titles_filter
-
 ) AS combined
-
 GROUP BY Rating
 ORDER BY COUNT(*) DESC
+``` 
  
+### 25.	Find each year and the average numbers of content release in India on netflix and return top 5 year with highest avg content release!
  
- 
- 
---25.	Find each year and the average numbers of content release in India on netflix and return top 5 year with highest avg content release!
- 
- 
+```sql
 SELECT TOP 5 release_year, COUNT(show_id) AS total_release, 
-
     ROUND(COUNT(show_id) * 1.0 / (SELECT COUNT(show_id) 
-
 	FROM Netflix_Titles_filter 
-
 	WHERE country = 'India') * 100, 2) AS avg_release
-
 FROM 
-
     Netflix_Titles_filter
-
 WHERE 
-
     country = 'India'
-
 GROUP BY 
-
     release_year
-
 ORDER BY 
-
     avg_release DESC
+```

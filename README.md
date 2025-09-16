@@ -20,6 +20,8 @@ Though the dataset for this project is sourced from the Kaggle dataset, but its 
 ## Business Problems and Solutions
  
 ### 1. Display the total Number of Movies vs TV Shows
+
+**Objective:** Determine the distribution of content types on Netflix.
  
 ```sql
 SELECT 

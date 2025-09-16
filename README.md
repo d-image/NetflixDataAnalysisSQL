@@ -32,7 +32,8 @@ GROUP BY type
 
 ### 2.	Count the Number of Content Items in Each Genre
 ...
-SELECT 
+sql
+   SELECT 
 	Trim(Value) AS genre,  
 	COUNT(*) AS total_content  
 FROM netflix_titles

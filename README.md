@@ -36,6 +36,5 @@ GROUP BY type
 			COUNT(*) AS total_content  
 		FROM netflix_titles
 		   CROSS APPLY string_split (listed_in, ',') 
-		GROUP BY Trim(Value);
-  ...
-		### Objective: Count the number of content items in each genre
+		GROUP BY Trim(Value);...
+### Objective: Count the number of content items in each genre

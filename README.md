@@ -260,7 +260,7 @@ WHERE Type IN ('Movie', 'TV Show') AND Director LIKE '%Rajiv Chilaka%'
 ```sql
 SELECT * FROM netflix_titles_filter
 WHERE Director LIKE '%Rajiv Chilaka%'
- 
+ ```
 --Method 3
 
 ```sql

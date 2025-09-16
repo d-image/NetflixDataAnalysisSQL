@@ -41,3 +41,11 @@ FROM netflix_titles
 GROUP BY Trim(Value);
 ```
 ### Objective: Count the number of content items in each genre
+
+###3.	List All Movies Released in a 2020
+```SELECT * 
+    FROM netflix_titles
+   WHERE release_year = 2020;
+ ```
+
+###Objective: Retrieve all movies released in a specific year.

@@ -270,3 +270,229 @@ JOIN netflix_director nd
 ON ntf.show_id = nd.show_id
 WHERE ntf.Type = 'Movie' AND nd.Director = 'Rajiv Chilaka'
 ```
+##$ 13.	List All TV Shows with More Than 5 Seasons
+ 
+```sql
+SELECT
+	Title,
+	TRIM(Value) Season
+FROM
+	netflix_titles_filter
+CROSS APPLY string_split(duration,' ',1)
+WHERE type = 'TV Show' and Ordinal = 1
+AND TRY_CAST(TRIM(Value) AS INT) > 5
+Order By CAST(TRIM(Value) AS INT) DESC
+``` 
+ 
+### 14.	List content items added after August 20, 2021
+ 
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE date_added > '2021-08-20'
+``` 
+
+### 15.	List movies added to on June 15, 2019
+
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE type = 'Movie' AND date_added = '2019-06-15'
+``` 
+### 16.	List content items added in 2021
+--Method 1
+
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE date_added >= '2021-01-01' AND date_added <= '2021-12-31'
+ ``` 
+--Method 2
+
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE date_added BETWEEN '2021-01-01' AND '2021-12-31'
+```
+--Method 3
+
+```sql
+Select *  
+From Netflix_Titles_filter
+Where date_added LIKE '%2021%'
+ ```
+--Method 4
+
+```sql
+SELECT * from netflix_titles where Year(date_added) = 2021
+``` 
+ 
+### 17.	List movies added in 2021
+
+--Method 1
+
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE type = 'Movie' AND date_added >= '2021-01-01' AND date_added <= '2021-12-31'
+``` 
+--Method 2
+
+```sql
+SELECT * FROM Netflix_Titles_filter
+WHERE type = 'Movie' AND  date_added BETWEEN '2021-01-01' AND '2021-12-31'
+``` 
+ --Method 3
+
+```sql
+Select *  
+From Netflix_Titles_filter
+Where type = 'Movie' AND date_added LIKE '%2021%'
+```  
+--Method 4
+
+```sql
+Select *  
+From Netflix_Titles_filter
+Where type = 'Movie' AND Year(date_added) = 2021
+``` 
+ 
+### 18.	Count the number of movies and tv series that each director has produced in different columns.
+
+```sql
+SELECT Trim(value) AS Directors, Type, Count(*) MovieANDTVShow 
+FROM Netflix_Titles_Filter
+CROSS APPLY string_split(director, ',')
+```
+WHERE type IN('Movie', 'TV Show') AND Director <> 'NA' 
+
+GROUP BY Trim(value), Type
+ 
+ 
+ 
+ 
+--19.	Which country has highest number of comedy movies?
+ 
+SELECT TOP 1 Trim(value) All_Country, Count(*) COMEDIES
+
+FROM Netflix_Titles_Filter
+
+CROSS APPLY string_split(country, ',')
+
+WHERE Type = 'Movie' AND listed_in LIKE '%comedies%' AND Trim(value) <> 'NA'
+
+GROUP BY Trim(value)
+
+ORDER BY Count(*) DESC
+ 
+ 
+ 
+--20.	For each year, which director has maximum number of movies released
+ 
+SELECT release_year, Trim(value) DIRECTOR, Count(*) MOVIES
+
+FROM Netflix_Titles_Filter
+
+CROSS APPLY string_split(director, ',')
+
+WHERE Type = 'Movie' AND director <> 'NA'
+
+GROUP BY release_year, Trim(value)
+
+ORDER BY Count(*) DESC
+ 
+ 
+ 
+ 
+--21.	What is the average running length of movies in each genre?
+ 
+SELECT Type, Title, Trim(value) as AVGERAGELEN
+
+FROM netflix_titles_filter
+
+CROSS APPLY string_split(Duration, ' ', 1)
+
+WHERE type = 'Movie' and Ordinal = 1
+
+ 
+ 
+ 
+--22.	List directors who have directed both comedies and horror films.
+ 
+SELECT DISTINCT Director, Trim(value) as ComedyAndHorror
+
+FROM Netflix_Titles_Filter
+
+CROSS APPLY string_split(Listed_in, ',')
+
+WHERE Listed_in LIKE '%Comedies%' AND Listed_in LIKE '%Horror%' AND Director <> 'NA'
+
+GROUP BY Trim(value), Director
+
+HAVING Trim(value) <> 'Independent Movies' AND Trim(value) <> 'Sci-Fi & Fantasy' AND Trim(value) <> 'International Movies' AND Trim(value) <> 'Action & Adventure' AND Trim(value) <> 'Cult Movies'
+ 
+ 
+ 
+--23.	List the director's name and the number of horror and comedy films that he or she has directed.
+
+SELECT Director, Count(*) MovieNumbers, Trim(value) as ComedyAndHorror
+
+FROM Netflix_Titles_Filter
+
+CROSS APPLY string_split(Listed_in, ',')
+
+WHERE Listed_in LIKE '%Comedies%' AND Listed_in LIKE '%Horror%' AND Director <> 'NA'
+
+GROUP BY Trim(value), Director
+
+HAVING Trim(value) <> 'Independent Movies' AND Trim(value) <> 'Sci-Fi & Fantasy' AND Trim(value) <> 'International Movies' AND Trim(value) <> 'Action & Adventure' AND Trim(value) <> 'Cult Movies'
+
+ORDER BY Count(*) DESC
+ 
+ 
+ 
+--24.	Find the Most Common Rating for Movies and TV Shows
+ 
+SELECT Rating, COUNT(*) AS CountRating
+
+FROM (
+
+    SELECT Rating
+
+    FROM Netflix_Titles_filter
+
+    UNION ALL 
+
+    SELECT Rating
+
+    FROM Netflix_Titles_filter
+
+) AS combined
+
+GROUP BY Rating
+ORDER BY COUNT(*) DESC
+ 
+ 
+ 
+ 
+--25.	Find each year and the average numbers of content release in India on netflix and return top 5 year with highest avg content release!
+ 
+ 
+SELECT TOP 5 release_year, COUNT(show_id) AS total_release, 
+
+    ROUND(COUNT(show_id) * 1.0 / (SELECT COUNT(show_id) 
+
+	FROM Netflix_Titles_filter 
+
+	WHERE country = 'India') * 100, 2) AS avg_release
+
+FROM 
+
+    Netflix_Titles_filter
+
+WHERE 
+
+    country = 'India'
+
+GROUP BY 
+
+    release_year
+
+ORDER BY 
+
+    avg_release DESC

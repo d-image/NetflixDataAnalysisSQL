@@ -132,3 +132,141 @@ ON ntf.show_id = nd.show_id
 
 WHERE nd.director = 'NA'
 ```
+
+### 8.	Find How Many Movies Actor 'Salman Khan' Appeared in the Last 10 Years
+
+--Method 1
+
+```sql
+SELECT * FROM netflix_titles_filter
+
+WHERE Type = 'Movie' AND cast LIKE '%Salman Khan%' AND  release_year > YEAR(GetDate()) - 10
+``` 
+--Method 2
+
+```sql
+SELECT ntf.*, nc.cast 
+
+FROM netflix_titles_filter ntf
+
+JOIN netflix_cast nc
+
+ON ntf.show_id = nc.show_id
+
+WHERE nc.cast = 'Salman Khan' AND  ntf.release_year > YEAR(GetDate()) - 10
+``` 
+ 
+ 
+### 9.	Find the Top 10 Actors Who Have Appeared in the Highest Number of Movies Produced in India
+
+--Method 1
+
+```sql
+SELECT TOP (10)
+
+	Trim(Value) AS Actor,
+
+	COUNT(*) HighestNumber
+
+FROM netflix_titles_filter
+
+CROSS APPLY STRING_SPLIT(cast,',')
+
+WHERE country LIKE '%India%' AND type = 'Movie'
+
+GROUP BY Trim(Value)
+
+Order BY COUNT(*) DESC
+``` 
+--Method 2, Using JOIN
+
+```sql
+SELECT TOP (10) trim(cast) Actor, Count(*) HighestNumber
+
+FROM netflix_titles_filter ntf
+
+JOIN netflix_cast nc
+
+ON ntf.show_id = nc.show_id
+
+WHERE ntf.country = 'India' AND ntf.type = 'Movie'
+
+GROUP BY trim(cast)
+
+Order BY COUNT(*) DESC
+``` 
+ 
+### 10.	Categorize the content based on the presence of the keywords 'kill' and 'violence' in the description field. Label content containing these keywords as 'Bad' and all other content as 'Good'. Count how many items fall into each category.
+ 
+--Method 1
+
+```sql
+SELECT Category, Count(*) CategoryCounts
+FROM
+	(
+	SELECT description,
+		CASE	
+			WHEN description LIKE '%kill%' OR description LIKE '%violence%' THEN 'Bad'
+		ELSE 
+			'Good'
+		END AS Category
+	FROM Netflix_Titles_Filter
+	)AS CategorizedContents
+GROUP BY Category
+```
+--Method 2
+
+```sql
+SELECT 
+	CASE
+		WHEN description LIKE '%kill%' OR description LIKE '%violence%' THEN 'Bad'
+		ELSE 'Good'
+	END as Category,
+	Count(*) as TotalCount
+FROM Netflix_Titles_Filter
+GROUP BY 
+	CASE
+		WHEN description LIKE '%kill%' OR description LIKE '%violence%' THEN 'Bad'
+		ELSE 'Good'
+	END;
+```
+ 
+ ### 11.	Identify the Longest Movie
+
+-- Our strint_split has another parameter called the ORDINAL VALUE. That when you use string_split, it will split the value of the column and return the first value as Ordinal 1, means the first value and not the second value. ORDINAL is like the index of the numbering. We CAST the Value because we need the answer as INTEGER.
+ 
+```sql
+SELECT TOP 1
+	Type,
+	Title,
+	Trim(Value) as TotalMunite,
+	Duration
+FROM Netflix_Titles_Filter
+CROSS APPLY string_split(duration, ' ', 1)
+WHERE type = 'Movie' AND ORDINAL = 1
+ORDER BY CAST(Trim(Value) AS INT) DESC
+``` 
+ 
+### 12.	Find All Movies/TV Shows by Director 'Rajiv Chilaka'
+
+--Method 1
+
+```sql
+SELECT * FROM netflix_titles_filter
+WHERE Type IN ('Movie', 'TV Show') AND Director LIKE '%Rajiv Chilaka%'
+``` 
+--Method 2
+
+```sql
+SELECT * FROM netflix_titles_filter
+WHERE Director LIKE '%Rajiv Chilaka%'
+ 
+--Method 3
+
+```sql
+SELECT *, ntf.type, nd.director 
+FROM netflix_titles_filter ntf
+JOIN netflix_director nd
+ON ntf.show_id = nd.show_id
+WHERE ntf.Type = 'Movie' AND nd.Director = 'Rajiv Chilaka'
+```

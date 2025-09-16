@@ -29,3 +29,13 @@ FROM netflix_titles
 GROUP BY type
 ```
 **Objective:** Determine the distribution of content types on Netflix.
+
+### 2.	Count the Number of Content Items in Each Genre
+		...SELECT 
+			Trim(Value) AS genre,  
+			COUNT(*) AS total_content  
+		FROM netflix_titles
+		   CROSS APPLY string_split (listed_in, ',') 
+		GROUP BY Trim(Value);
+  ...
+		### Objective: Count the number of content items in each genre

@@ -360,6 +360,7 @@ FROM Netflix_Titles_Filter
 CROSS APPLY string_split(director, ',')
 WHERE type IN('Movie', 'TV Show') AND Director <> 'NA' 
 GROUP BY Trim(value), Type
+```
  
 ### 19.	Which country has highest number of comedy movies?
  
